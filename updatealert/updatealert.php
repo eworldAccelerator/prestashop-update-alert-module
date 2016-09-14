@@ -28,12 +28,11 @@ if (!defined('_PS_VERSION_')) {
 	exit;
 }
 ini_set('display_errors', 1);
-require_once 'updateAlertHandler.php';
+require_once 'UpdateAlertModule.php';
+require_once 'UpdateAlertCron.php';
+require_once 'UpdateAlertAlert.php';
 
 class UpdateAlert extends Module {
-	protected $config_form = false;
-	/** @var UpdateAlert $UpdateAlert */
-	private $eworldAcceleratorHandler;
 
 	public function __construct() {
 		$this->name = 'updatealert';
