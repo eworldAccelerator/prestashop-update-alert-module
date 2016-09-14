@@ -76,6 +76,7 @@ class UpdateAlert extends Module {
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_EMAILS');
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_DAYS');
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_CONTENT');
+		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_LAST');
 
 		// Uninstall Tabs
 		$moduleTabs = Tab::getCollectionFromModule($this->name);

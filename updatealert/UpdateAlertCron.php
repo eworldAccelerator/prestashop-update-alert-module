@@ -209,6 +209,19 @@ class UpdateAlertCron {
 	}
 
 	/**
+	 * @param string $moduleName
+	 * @return int
+	 */
+	private function getModuleFirstAlert($moduleName) {
+		if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
+			if (array_key_exists($moduleName, $this->lastAlertsList)) {
+				return $this->lastAlertsList[$moduleName]->getFirstAlert();
+			}
+		}
+		return 0;
+	}
+
+	/**
 	 * @return bool
 	 */
 	private function canSendEmail() {
@@ -217,20 +230,47 @@ class UpdateAlertCron {
 	}
 
 	private function sendEmail() {
+		global $smarty;
 		if (sizeof($this->modulesToSendList) > 0) {
 			$subject = '[UpdateAlert system] Your prestashop on '._PS_BASE_URL_.' needs upgrade';
+
+			$htmlContent = '';
+			if ($this->isPrestashopNeedsUpgrade()) {
+				$htmlContent .= '<strong>Your Prestashop</strong> on '.$_SERVER['HTTP_HOST'].' needs to be upgraded to new version : <a href="'.$this->prestashopUpgrade['link'].'">'.$this->prestashopUpgrade['name'].'</a><br /><br />';
+			}
+			$htmlContent .= 'Module <strong>UpdateAlert</strong> on your Prestashop detects following upgrade needs :<br />
+<table cellspacing="1" cellpadding="4" border="0" bgcolor="#999999">
+<thead>
+<tr bgcolor="#ffffff">
+	<th>Module</th>
+	<th>Version</th>
+	<th>Upgrade to</th>
+	<th>Available since</th>
+</tr>
+</thead>
+<tbody>
+';
+			foreach ($this->modulesToSendList as $currentUpdateAlertModule) {
+				$htmlContent .= '<tr bgcolor="#ffffff">
+		<td>'.$currentUpdateAlertModule->getName().'</td>
+		<td>'.$currentUpdateAlertModule->getCurrentVersion().'</td>
+		<td>'.$currentUpdateAlertModule->getAvailableVersion().'</td>
+		<td>'.($this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName()) > 0 ? date('Y-m-d', $this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName())) : '-').'</td>
+	</tr>';
+			}
+			$htmlContent .= '</tbody>
+</table>';
+
+			// Pay attention, only text variables allowed, so HTML has been generated before
 			Mail::Send(
 				2,
-				'mail_alerte',
+				'mail_alert',
 				$subject,
 				array(
-					'domainPresta' => _PS_BASE_URL_,
-					'modules' => $this->modulesToSendList,
-					'prestaNeedsUpgrade' => $this->isPrestashopNeedsUpgrade(),
-					'prestaUpgradeInfos' => $this->getPrestashopUpgrade(),
+					'{htmlContent}' => $htmlContent,
 				),
 				'ben@progweb.fr', NULL, NULL, NULL, NULL, NULL,
-				dirname(__FILE__).'views/templates/admin'
+				dirname(__FILE__).'/views/templates/'
 			);
 			// Update last global email sent value
 			$this->saveLastEmailSent();
@@ -243,18 +283,25 @@ class UpdateAlertCron {
 	 * @param UpdateAlertModule $updateAlertModule
 	 */
 	private function sendNewUpgradeEmail($updateAlertModule) {
+		global $smarty;
 		if (is_object($updateAlertModule)) {
 			$subject = '[UpdateAlert system] A module needs update on your prestashop on '._PS_BASE_URL_;
+
+			$htmlContent = 'A new upgrade is available for the module <strong>'.$updateAlertModule->getName().'</strong>.<br />
+<br />
+currently : '.$updateAlertModule->getCurrentVersion().'<br />
+new version : '.$updateAlertModule->getAvailableVersion().'<br />';
+
+			// Pay attention, only text variables allowed, so HTML has been generated before
 			Mail::Send(
 				2,
-				'mail_alerte_new_module',
+				'mail_alert',
 				$subject,
 				array(
-					'domainPresta' => _PS_BASE_URL_,
-					'module' => $updateAlertModule,
+					'{htmlContent}' => $htmlContent,
 				),
 				'ben@progweb.fr', NULL, NULL, NULL, NULL, NULL,
-				dirname(__FILE__).'views/templates/admin'
+				dirname(__FILE__).'/views/templates/'
 			);
 			// Add the module to recorded alerts
 			$this->lastAlertsList[$updateAlertModule->getModuleName()] = new UpdateAlertAlert(

@@ -1,0 +1,7 @@
+Hi,
+
+There is some update to do on your Prestashop.
+Please, accept HTML emails to view details or connect to the backOffice.
+
+Best regards,
+UpdateAlert Prestashop Module

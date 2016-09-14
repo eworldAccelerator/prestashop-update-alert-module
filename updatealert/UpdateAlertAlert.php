@@ -7,9 +7,13 @@
  */
 
 class UpdateAlertAlert {
+	/** @var int $firstAlert */
 	private $firstAlert;
+	/** @var int $lastAlert */
 	private $lastAlert;
+	/** @var string $moduleName */
 	private $moduleName;
+	/** @var string $version */
 	private $version;
 
 	function __construct($moduleName, $version, $firstAlert) {
@@ -20,28 +24,28 @@ class UpdateAlertAlert {
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getFirstAlert() {
 		return $this->firstAlert;
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getLastAlert() {
 		return $this->lastAlert;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getModuleName() {
 		return $this->moduleName;
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getVersion() {
 		return $this->version;
