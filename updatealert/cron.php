@@ -10,4 +10,7 @@ include(dirname(__FILE__).'/../../config/config.inc.php');
 //include(dirname(__FILE__).'/../../classes/Mail.php');
 require 'updatealert.php';
 
-$cron = new UpdateAlertCron(true);
+$cron = new UpdateAlertCron();
+
+// At least one character to say "It's ok!"
+echo 1;

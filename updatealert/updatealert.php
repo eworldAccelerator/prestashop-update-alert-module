@@ -73,7 +73,7 @@ class UpdateAlert extends Module {
 
 	public function uninstall() {
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_ENABLED');
-		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_EMAILS');
+		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_EMAIL');
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_DAYS');
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_CONTENT');
 		Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_LAST');
@@ -132,11 +132,6 @@ class UpdateAlert extends Module {
 			'fields_value' => $this->getConfigFormValues(), /* Add values for your inputs */
 			'languages' => $this->context->controller->getLanguages(),
 			'id_language' => $this->context->language->id,
-			'configured' => trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED')) != '',
-			'enabled' => trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED')),
-			'emailList' => trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_EMAIL')),
-			'days' => trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_DAYS')),
-			'updateAlertContent' => trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_CONTENT')) != '' ? unserialize(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_CONTENT')) : null,
 		);
 
 		return $helper->generateForm(array($this->getConfigForm()));
@@ -202,7 +197,7 @@ class UpdateAlert extends Module {
 	 */
 	protected function getConfigFormValues() {
 		// Definied values
-		if (intval(trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 1 || intval(trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 2) {
+		if (intval(trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 1 || intval(trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 2) {
 			return array(
 				'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'),
 				'EWORLDACCELERATOR_UPDATEALERT_EMAIL' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_EMAIL'),
@@ -248,6 +243,7 @@ class UpdateAlert extends Module {
 			$emailArray = explode(PHP_EOL, $emailList);
 			if (sizeof($emailArray) > 0) {
 				foreach ($emailArray as $currentEmail) {
+					$currentEmail = trim($currentEmail);
 					if (filter_var($currentEmail, FILTER_VALIDATE_EMAIL) === false) {
 						$this->errors[] = $this->displayError($this->l($currentEmail.' is not a valid email address'));
 						$listOk = false;

@@ -17,6 +17,8 @@ class UpdateAlertCron {
 	private $modulesToSendList;
 	/** @var UpdateAlertAlert[] $lastAlertsList */
 	private $lastAlertsList;
+	/** @var string[] $recipientsList */
+	private $recipientsList;
 	/** @var int $lastEmailAlert */
 	private $lastEmailAlert;
 	/** @var int $alertDelay */
@@ -32,6 +34,7 @@ class UpdateAlertCron {
 		$this->outdatedModulesList = array();
 		$this->lastAlertsList = array();
 		$this->modulesToSendList = array();
+		$this->recipientsList = array();
 		$this->lastEmailAlert = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_LAST');
 		$this->alertDelay = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_DAYS');
 
@@ -86,6 +89,26 @@ class UpdateAlertCron {
 			}
 		}
 
+		// Get email recipients
+		$emailContent = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_EMAIL');
+		if ($emailContent != '') {
+			if (strpos($emailContent, PHP_EOL) !== false) {
+				$this->recipientsList = explode(PHP_EOL, $emailContent);
+			}
+			else {
+				$this->recipientsList = array(trim($emailContent));
+			}
+		}
+		if (sizeof($this->recipientsList) <= 0) {
+			echo '$emailContent='.$emailContent.'<br />';
+			echo '<h3>Recipients</h3><pre>'.print_r($this->recipientsList,1).'</pre>';
+			die ('Error, recipients empty');
+		}
+
+		if ($this->debugMode) {
+			echo 'Recipients : '.sizeof($this->recipientsList).'<br />';
+		}
+
 		// Check new modules update
 		if (is_array($this->outdatedModulesList) && sizeof($this->outdatedModulesList) > 0) {
 			foreach ($this->outdatedModulesList as $currentUpdateAlertModule) {
@@ -126,6 +149,7 @@ class UpdateAlertCron {
 		}
 
 		if ($this->debugMode) {
+			echo '<h3>Recipients</h3><pre>'.print_r($this->recipientsList,1).'</pre>';
 			echo '<h3>Modules installed</h3><pre>'.print_r($this->installedModulesList,1).'</pre>';
 			echo '<h3>Modules outdated</h3><pre>'.print_r($this->outdatedModulesList,1).'</pre>';
 			if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
@@ -232,7 +256,7 @@ class UpdateAlertCron {
 	private function sendEmail() {
 		global $smarty;
 		if (sizeof($this->modulesToSendList) > 0) {
-			$subject = '[UpdateAlert system] Your prestashop on '._PS_BASE_URL_.' needs upgrade';
+			$subject = '[UpdateAlert system] Your prestashop on '.$_SERVER['HTTP_HOST'].' needs upgrade';
 
 			$htmlContent = '';
 			if ($this->isPrestashopNeedsUpgrade()) {
@@ -262,16 +286,18 @@ class UpdateAlertCron {
 </table>';
 
 			// Pay attention, only text variables allowed, so HTML has been generated before
-			Mail::Send(
-				2,
-				'mail_alert',
-				$subject,
-				array(
-					'{htmlContent}' => $htmlContent,
-				),
-				'ben@progweb.fr', NULL, NULL, NULL, NULL, NULL,
-				dirname(__FILE__).'/views/templates/'
-			);
+			foreach ($this->recipientsList as $currentEmail) {
+				Mail::Send(
+					2,
+					'mail_alert',
+					$subject,
+					array(
+						'{htmlContent}' => $htmlContent,
+					),
+					trim($currentEmail), NULL, NULL, NULL, NULL, NULL,
+					dirname(__FILE__) . '/views/templates/'
+				);
+			}
 			// Update last global email sent value
 			$this->saveLastEmailSent();
 			// Update all alerts
@@ -285,7 +311,7 @@ class UpdateAlertCron {
 	private function sendNewUpgradeEmail($updateAlertModule) {
 		global $smarty;
 		if (is_object($updateAlertModule)) {
-			$subject = '[UpdateAlert system] A module needs update on your prestashop on '._PS_BASE_URL_;
+			$subject = '[UpdateAlert system] A module needs update on your prestashop on '.$_SERVER['HTTP_HOST'];
 
 			$htmlContent = 'A new upgrade is available for the module <strong>'.$updateAlertModule->getName().'</strong>.<br />
 <br />
@@ -293,16 +319,18 @@ currently : '.$updateAlertModule->getCurrentVersion().'<br />
 new version : '.$updateAlertModule->getAvailableVersion().'<br />';
 
 			// Pay attention, only text variables allowed, so HTML has been generated before
-			Mail::Send(
-				2,
-				'mail_alert',
-				$subject,
-				array(
-					'{htmlContent}' => $htmlContent,
-				),
-				'ben@progweb.fr', NULL, NULL, NULL, NULL, NULL,
-				dirname(__FILE__).'/views/templates/'
-			);
+			foreach ($this->recipientsList as $currentEmail) {
+				Mail::Send(
+					2,
+					'mail_alert',
+					$subject,
+					array(
+						'{htmlContent}' => $htmlContent,
+					),
+					trim($currentEmail), NULL, NULL, NULL, NULL, NULL,
+					dirname(__FILE__).'/views/templates/'
+				);
+			}
 			// Add the module to recorded alerts
 			$this->lastAlertsList[$updateAlertModule->getModuleName()] = new UpdateAlertAlert(
 				$updateAlertModule->getModuleName(),
