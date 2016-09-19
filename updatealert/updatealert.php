@@ -42,7 +42,8 @@ class UpdateAlert extends Module
         $this->displayName = $this->l('Update Alert');
         $this->description = $this->l('Send you emails for each update (Prestashop or modules)');
 
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+        /* Have to force max to 1.7 cause compliancy is wrong in Prestashop module class */
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
 
         /* Backward compatibility */
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
