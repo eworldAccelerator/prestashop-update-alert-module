@@ -27,7 +27,7 @@
 if (!defined('_PS_VERSION_')) {
 	exit;
 }
-ini_set('display_errors', 1);
+
 require_once 'UpdateAlertModule.php';
 require_once 'UpdateAlertCron.php';
 require_once 'UpdateAlertAlert.php';
@@ -40,19 +40,26 @@ class UpdateAlert extends Module {
 		$this->version = '0.1.0';
 		$this->author = 'eworld Accelerator';
 		$this->need_instance = 0;
-		$this->eworldAcceleratorHandler = null;
 
 		/**
 		 * Set $this->bootstrap to true if your module is compliant with bootstrap (PrestaShop 1.6)
 		 */
-		$this->bootstrap = true;
+		if (version_compare(_PS_VERSION_, '1.6', '>=')) {
+			$this->bootstrap = true;
+		}
 
 		parent::__construct();
 
 		$this->displayName = $this->l('Update Alert');
 		$this->description = $this->l('Send you emails for each update (Prestashop or modules)');
+		$this->confirmUninstall = $this->l('Warning: all the data saved in your database will be deleted. Are you sure you want uninstall this module?');
 
 		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
+
+		/* Backward compatibility */
+		if (version_compare(_PS_VERSION_, '1.5', '<')) {
+			require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
+		}
 	}
 
 	/**
