@@ -53,11 +53,11 @@ class UpdateAlert extends Module
 
     public function uninstall()
     {
-        Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_ENABLED');
-        Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_EMAIL');
-        Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_DAYS');
-        Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_CONTENT');
-        Configuration::deleteByName('EWORLDACCELERATOR_UPDATEALERT_LAST');
+        Configuration::deleteByName('EACC_UPDATEALERT_ENABLED');
+        Configuration::deleteByName('EACC_UPDATEALERT_EMAIL');
+        Configuration::deleteByName('EACC_UPDATEALERT_DAYS');
+        Configuration::deleteByName('EACC_UPDATEALERT_CONTENT');
+        Configuration::deleteByName('EACC_UPDATEALERT_LAST');
 
         // Uninstall Tabs
         $moduleTabs = Tab::getCollectionFromModule($this->name);
@@ -77,7 +77,7 @@ class UpdateAlert extends Module
         /**
          * If values have been submitted in the form, process.
          */
-        if (((bool)Tools::isSubmit('submitUpdatealertModule')) == true) {
+        if (((bool)Tools::isSubmit('submitUpdateAlertModule')) == true) {
             $this->postProcess();
         }
 
@@ -135,7 +135,7 @@ class UpdateAlert extends Module
                     array(
                         'type' => 'radio',
                         'label' => $this->l('Enable system'),
-                        'name' => 'EWORLDACCELERATOR_UPDATEALERT_ENABLED',
+                        'name' => 'EACC_UPDATEALERT_ENABLED',
                         'class' => 't',
                         'required' => true,
                         'is_bool' => true,
@@ -155,14 +155,14 @@ class UpdateAlert extends Module
                     array(
                         'type' => 'textarea',
                         'label' => $this->l('Email list'),
-                        'name' => 'EWORLDACCELERATOR_UPDATEALERT_EMAIL',
+                        'name' => 'EACC_UPDATEALERT_EMAIL',
                         'desc' => '1 email per line',
                         'required' => true
                     ),
                     array(
                         'type' => 'text',
                         'label' => $this->l('Day(s) between alerts'),
-                        'name' => 'EWORLDACCELERATOR_UPDATEALERT_DAYS',
+                        'name' => 'EACC_UPDATEALERT_DAYS',
                         'class' => 'lg',
                         'required' => true,
                         'desc' => $this->l('Minimum: 1, Maximum: 31')
@@ -182,19 +182,21 @@ class UpdateAlert extends Module
     protected function getConfigFormValues()
     {
         // Definied values
-        $enabled = (int)trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'));
+        $enabled = (int) trim(Configuration::get('EACC_UPDATEALERT_ENABLED'));
+        /*var_dump(trim(Configuration::get('EACC_UPDATEALERT_ENABLED')));
+        var_dump($enabled);exit;*/
         if ($enabled == 1 || $enabled == 2) {
             return array(
-                'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => $enabled,
-                'EWORLDACCELERATOR_UPDATEALERT_EMAIL' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_EMAIL'),
-                'EWORLDACCELERATOR_UPDATEALERT_DAYS' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_DAYS'),
+                'EACC_UPDATEALERT_ENABLED' => $enabled,
+                'EACC_UPDATEALERT_EMAIL' => Configuration::get('EACC_UPDATEALERT_EMAIL'),
+                'EACC_UPDATEALERT_DAYS' => Configuration::get('EACC_UPDATEALERT_DAYS'),
             );
         } // Default values
         else {
             return array(
-                'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => 1,
-                'EWORLDACCELERATOR_UPDATEALERT_EMAIL' => '',
-                'EWORLDACCELERATOR_UPDATEALERT_DAYS' => 1,
+                'EACC_UPDATEALERT_ENABLED' => 1,
+                'EACC_UPDATEALERT_EMAIL' => '',
+                'EACC_UPDATEALERT_DAYS' => 1,
             );
         }
     }
@@ -204,15 +206,15 @@ class UpdateAlert extends Module
      */
     protected function postProcess()
     {
-        $enabled = trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED'));
-        $emailList = trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_EMAIL'));
-        $days = (int)trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_DAYS'));
+        $enabled = trim(Tools::getValue('EACC_UPDATEALERT_ENABLED'));
+        $emailList = trim(Tools::getValue('EACC_UPDATEALERT_EMAIL'));
+        $days = (int)trim(Tools::getValue('EACC_UPDATEALERT_DAYS'));
 
         if ($enabled != 1 && $enabled != 2) {
             $this->errors[] = $this->displayError($this->l('Enabled value is not recognized'));
         } else {
-            $oldValue = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED');
-            Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED', $enabled);
+            $oldValue = Configuration::get('EACC_UPDATEALERT_ENABLED');
+            Configuration::updateValue('EACC_UPDATEALERT_ENABLED', $enabled);
             if ($enabled == 1 && $oldValue == 2) {
                 $this->errors[] = $this->displayConfirmation($this->l('System enabled'));
             } else if ($enabled == 2 && $oldValue == 1) {
@@ -234,13 +236,13 @@ class UpdateAlert extends Module
                 }
             }
             if ($listOk) {
-                Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_EMAIL', $emailList);
+                Configuration::updateValue('EACC_UPDATEALERT_EMAIL', $emailList);
             }
         }
         if ($days < 1 || $days > 31) {
             $this->errors[] = $this->displayError($this->l('Days value is not correct'));
         } else {
-            Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_DAYS', $days);
+            Configuration::updateValue('EACC_UPDATEALERT_DAYS', $days);
         }
     }
 }

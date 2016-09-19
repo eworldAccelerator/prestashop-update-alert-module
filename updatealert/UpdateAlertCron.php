@@ -43,8 +43,8 @@ class UpdateAlertCron
         $this->lastAlertsList = array();
         $this->modulesToSendList = array();
         $this->recipientsList = array();
-        $this->lastEmailAlert = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_LAST');
-        $this->alertDelay = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_DAYS');
+        $this->lastEmailAlert = Configuration::get('EACC_UPDATEALERT_LAST');
+        $this->alertDelay = Configuration::get('EACC_UPDATEALERT_DAYS');
 
         if ($this->debugMode) {
             echo 'Last email alert : ' . date('Y-m-d H:i.s', $this->lastEmailAlert) . '<br />';
@@ -84,7 +84,7 @@ class UpdateAlertCron
         }
 
         // Get old alerts
-        $data = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_CONTENT');
+        $data = Configuration::get('EACC_UPDATEALERT_CONTENT');
         if (!empty($data)) {
             $this->lastAlertsList = unserialize($data);
         }
@@ -97,7 +97,7 @@ class UpdateAlertCron
         }
 
         // Get email recipients
-        $emailContent = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_EMAIL');
+        $emailContent = Configuration::get('EACC_UPDATEALERT_EMAIL');
         if ($emailContent != '') {
             if (strpos($emailContent, PHP_EOL) !== false) {
                 $this->recipientsList = explode(PHP_EOL, $emailContent);
@@ -229,7 +229,7 @@ class UpdateAlertCron
 
     private function saveLastEmailSent()
     {
-        Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_LAST', time() - 3600); // -3600 if the script takes too long
+        Configuration::updateValue('EACC_UPDATEALERT_LAST', time() - 3600); // -3600 if the script takes too long
     }
 
     private function updateAllLastAlerts()
@@ -245,7 +245,7 @@ class UpdateAlertCron
 
     private function saveLastAlertsList()
     {
-        Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_CONTENT', serialize($this->lastAlertsList));
+        Configuration::updateValue('EACC_UPDATEALERT_CONTENT', serialize($this->lastAlertsList));
     }
 
     /**
