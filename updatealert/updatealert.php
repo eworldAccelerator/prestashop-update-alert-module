@@ -52,7 +52,7 @@ class UpdateAlert extends Module {
 		$this->displayName = $this->l('Update Alert');
 		$this->description = $this->l('Send you emails for each update (Prestashop or modules)');
 
-		$this->ps_versions_compliancy = array('min' => '1.6', 'max' => _PS_VERSION_);
+		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 	}
 
 	/**
