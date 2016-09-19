@@ -1,11 +1,18 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Ben
- * Date: 14/09/2016
- * Time: 14:56
- */
 
+/**
+ * NOTICE OF LICENSE
+ *
+ * This file is licenced under the Software License Agreement.
+ * With the purchase or the installation of the software in your application
+ * you accept the licence agreement.
+ *
+ * You must not modify, adapt or create derivative works of this source code
+ *
+ * @author    eworld Accelerator
+ * @copyright 2010-2016 E-WORLD-CONCEPT SAS
+ * @license   LICENSE.txt
+ */
 class UpdateAlertCron {
 	/** @var array $prestashopUpgrade */
 	private $prestashopUpgrade;
@@ -26,7 +33,7 @@ class UpdateAlertCron {
 	/** @var bool $debugMode */
 	private $debugMode;
 
-	function __construct($debugMode=false) {
+	public function __construct($debugMode = false) {
 		// Init
 		$this->debugMode = $debugMode;
 		$this->prestashopUpgrade = array();
@@ -39,8 +46,8 @@ class UpdateAlertCron {
 		$this->alertDelay = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_DAYS');
 
 		if ($this->debugMode) {
-			echo 'Last email alert : '.date('Y-m-d H:i.s', $this->lastEmailAlert).'<br />';
-			echo 'Alert delay : '.$this->alertDelay.' days<br />';
+			echo 'Last email alert : ' . date('Y-m-d H:i.s', $this->lastEmailAlert) . '<br />';
+			echo 'Alert delay : ' . $this->alertDelay . ' days<br />';
 		}
 
 		// Check Prestashop Core
@@ -48,12 +55,12 @@ class UpdateAlertCron {
 		$this->prestashopUpgrade = $upgradeCore->checkPSVersion();
 
 		if ($this->debugMode && $this->isPrestashopNeedsUpgrade()) {
-			echo 'Prestashop needs an upgrade to '.$this->prestashopUpgrade['name'].'<br />';
+			echo 'Prestashop needs an upgrade to ' . $this->prestashopUpgrade['name'] . '<br />';
 		}
 
 		// Check modules
 		$moduleList = Module::getModulesOnDisk();
-		if (is_array($moduleList) && sizeof($moduleList) > 0) {
+		if (is_array($moduleList) && count($moduleList) > 0) {
 			foreach ($moduleList as $currentModule) {
 				if ($currentModule->installed) {
 					$this->installedModulesList[$currentModule->name] = $currentModule;
@@ -71,8 +78,8 @@ class UpdateAlertCron {
 		}
 
 		if ($this->debugMode) {
-			echo 'Modules installed : '.sizeof($this->installedModulesList).'<br />';
-			echo 'Modules outdated : '.sizeof($this->outdatedModulesList).'<br />';
+			echo 'Modules installed : ' . count($this->installedModulesList) . '<br />';
+			echo 'Modules outdated : ' . count($this->outdatedModulesList) . '<br />';
 		}
 
 		// Get old alerts
@@ -81,11 +88,10 @@ class UpdateAlertCron {
 			$this->lastAlertsList = unserialize($data);
 		}
 		if ($this->debugMode) {
-			if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
-				echo 'Modules already "alerted" : '.sizeof($this->lastAlertsList).'<br />';
-			}
-			else {
-				echo 'Maybe an error in unserialize from data :<br />'.htmlentities($data).'<br />';
+			if (is_array($this->lastAlertsList) && count($this->lastAlertsList) > 0) {
+				echo 'Modules already "alerted" : ' . count($this->lastAlertsList) . '<br />';
+			} else {
+				echo 'Maybe an error in unserialize from data :<br />' . htmlentities($data) . '<br />';
 			}
 		}
 
@@ -94,30 +100,28 @@ class UpdateAlertCron {
 		if ($emailContent != '') {
 			if (strpos($emailContent, PHP_EOL) !== false) {
 				$this->recipientsList = explode(PHP_EOL, $emailContent);
-			}
-			else {
+			} else {
 				$this->recipientsList = array(trim($emailContent));
 			}
 		}
-		if (sizeof($this->recipientsList) <= 0) {
-			echo '$emailContent='.$emailContent.'<br />';
-			echo '<h3>Recipients</h3><pre>'.print_r($this->recipientsList,1).'</pre>';
+		if (count($this->recipientsList) <= 0) {
+			echo '$emailContent=' . $emailContent . '<br />';
+			echo '<h3>Recipients</h3><pre>' . print_r($this->recipientsList, 1) . '</pre>';
 			die ('Error, recipients empty');
 		}
 
 		if ($this->debugMode) {
-			echo 'Recipients : '.sizeof($this->recipientsList).'<br />';
+			echo 'Recipients : ' . count($this->recipientsList) . '<br />';
 		}
 
 		// Check new modules update
-		if (is_array($this->outdatedModulesList) && sizeof($this->outdatedModulesList) > 0) {
+		if (is_array($this->outdatedModulesList) && count($this->outdatedModulesList) > 0) {
 			foreach ($this->outdatedModulesList as $currentUpdateAlertModule) {
 				$sendNew = false;
 				// if none alert for this module
 				if (!array_key_exists($currentUpdateAlertModule->getModuleName(), $this->lastAlertsList)) {
 					$sendNew = true;
-				}
-				else {
+				} else {
 					// If there is an alert, but for an older version than today
 					$currentUpdateAlertAlert = $this->lastAlertsList[$currentUpdateAlertModule->getModuleName()];
 					if ($currentUpdateAlertAlert->getVersion() != $currentUpdateAlertModule->getAvailableVersion()) {
@@ -128,7 +132,7 @@ class UpdateAlertCron {
 				// If a new version is available for this module
 				if ($sendNew) {
 					if ($this->debugMode) {
-						echo 'Module '.$currentUpdateAlertModule->getName().' ['.$currentUpdateAlertModule->getModuleName().'] have a new available version ('.$currentUpdateAlertModule->getAvailableVersion().')<br />';
+						echo 'Module ' . $currentUpdateAlertModule->getName() . ' [' . $currentUpdateAlertModule->getModuleName() . '] have a new available version (' . $currentUpdateAlertModule->getAvailableVersion() . ')<br />';
 					}
 					$this->sendNewUpgradeEmail($currentUpdateAlertModule);
 				}
@@ -144,15 +148,15 @@ class UpdateAlertCron {
 			$this->sendEmail();
 
 			if ($this->debugMode) {
-				echo 'Global email with outdated modules ('.sizeof($this->modulesToSendList).') has been sent<br />';
+				echo 'Global email with outdated modules (' . count($this->modulesToSendList) . ') has been sent<br />';
 			}
 		}
 
 		if ($this->debugMode) {
-			echo '<h3>Recipients</h3><pre>'.print_r($this->recipientsList,1).'</pre>';
-			echo '<h3>Modules installed</h3><pre>'.print_r($this->installedModulesList,1).'</pre>';
-			echo '<h3>Modules outdated</h3><pre>'.print_r($this->outdatedModulesList,1).'</pre>';
-			if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
+			echo '<h3>Recipients</h3><pre>' . print_r($this->recipientsList, 1) . '</pre>';
+			echo '<h3>Modules installed</h3><pre>' . print_r($this->installedModulesList, 1) . '</pre>';
+			echo '<h3>Modules outdated</h3><pre>' . print_r($this->outdatedModulesList, 1) . '</pre>';
+			if (is_array($this->lastAlertsList) && count($this->lastAlertsList) > 0) {
 				echo '<h3>Modules already "alerted"</h3><pre>' . print_r($this->lastAlertsList, 1) . '</pre>';
 			}
 		}
@@ -215,12 +219,12 @@ class UpdateAlertCron {
 	}
 
 	private function saveLastEmailSent() {
-		Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_LAST', time()-3600); // -3600 if the script takes too long
+		Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_LAST', time() - 3600); // -3600 if the script takes too long
 	}
 
 	private function updateAllLastAlerts() {
-		if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
-			foreach ($this->lastAlertsList as $key=>$value) {
+		if (is_array($this->lastAlertsList) && count($this->lastAlertsList) > 0) {
+			foreach ($this->lastAlertsList as $key => $value) {
 				$this->lastAlertsList[$key]->alertSent();
 			}
 			// Save modification
@@ -237,7 +241,7 @@ class UpdateAlertCron {
 	 * @return int
 	 */
 	private function getModuleFirstAlert($moduleName) {
-		if (is_array($this->lastAlertsList) && sizeof($this->lastAlertsList) > 0) {
+		if (is_array($this->lastAlertsList) && count($this->lastAlertsList) > 0) {
 			if (array_key_exists($moduleName, $this->lastAlertsList)) {
 				return $this->lastAlertsList[$moduleName]->getFirstAlert();
 			}
@@ -254,13 +258,12 @@ class UpdateAlertCron {
 	}
 
 	private function sendEmail() {
-		global $smarty;
-		if (sizeof($this->modulesToSendList) > 0) {
-			$subject = '[UpdateAlert system] Your prestashop on '.$_SERVER['HTTP_HOST'].' needs upgrade';
+		if (count($this->modulesToSendList) > 0) {
+			$subject = '[UpdateAlert system] Your prestashop on ' . $_SERVER['HTTP_HOST'] . ' needs upgrade';
 
 			$htmlContent = '';
 			if ($this->isPrestashopNeedsUpgrade()) {
-				$htmlContent .= '<strong>Your Prestashop</strong> on '.$_SERVER['HTTP_HOST'].' needs to be upgraded to new version : <a href="'.$this->prestashopUpgrade['link'].'">'.$this->prestashopUpgrade['name'].'</a><br /><br />';
+				$htmlContent .= '<strong>Your Prestashop</strong> on ' . $_SERVER['HTTP_HOST'] . ' needs to be upgraded to new version : <a href="' . $this->prestashopUpgrade['link'] . '">' . $this->prestashopUpgrade['name'] . '</a><br /><br />';
 			}
 			$htmlContent .= 'Module <strong>UpdateAlert</strong> on your Prestashop detects following upgrade needs :<br />
 <table cellspacing="1" cellpadding="4" border="0" bgcolor="#999999">
@@ -276,10 +279,10 @@ class UpdateAlertCron {
 ';
 			foreach ($this->modulesToSendList as $currentUpdateAlertModule) {
 				$htmlContent .= '<tr bgcolor="#ffffff">
-		<td>'.$currentUpdateAlertModule->getName().'</td>
-		<td>'.$currentUpdateAlertModule->getCurrentVersion().'</td>
-		<td>'.$currentUpdateAlertModule->getAvailableVersion().'</td>
-		<td>'.($this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName()) > 0 ? date('Y-m-d', $this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName())) : '-').'</td>
+		<td>' . $currentUpdateAlertModule->getName() . '</td>
+		<td>' . $currentUpdateAlertModule->getCurrentVersion() . '</td>
+		<td>' . $currentUpdateAlertModule->getAvailableVersion() . '</td>
+		<td>' . ($this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName()) > 0 ? date('Y-m-d', $this->getModuleFirstAlert($currentUpdateAlertModule->getModuleName())) : '-') . '</td>
 	</tr>';
 			}
 			$htmlContent .= '</tbody>
@@ -309,14 +312,13 @@ class UpdateAlertCron {
 	 * @param UpdateAlertModule $updateAlertModule
 	 */
 	private function sendNewUpgradeEmail($updateAlertModule) {
-		global $smarty;
 		if (is_object($updateAlertModule)) {
-			$subject = '[UpdateAlert system] A module needs update on your prestashop on '.$_SERVER['HTTP_HOST'];
+			$subject = '[UpdateAlert system] A module needs update on your prestashop on ' . $_SERVER['HTTP_HOST'];
 
-			$htmlContent = 'A new upgrade is available for the module <strong>'.$updateAlertModule->getName().'</strong>.<br />
+			$htmlContent = 'A new upgrade is available for the module <strong>' . $updateAlertModule->getName() . '</strong>.<br />
 <br />
-currently : '.$updateAlertModule->getCurrentVersion().'<br />
-new version : '.$updateAlertModule->getAvailableVersion().'<br />';
+currently : ' . $updateAlertModule->getCurrentVersion() . '<br />
+new version : ' . $updateAlertModule->getAvailableVersion() . '<br />';
 
 			// Pay attention, only text variables allowed, so HTML has been generated before
 			foreach ($this->recipientsList as $currentEmail) {
@@ -328,7 +330,7 @@ new version : '.$updateAlertModule->getAvailableVersion().'<br />';
 						'{htmlContent}' => $htmlContent,
 					),
 					trim($currentEmail), NULL, NULL, NULL, NULL, NULL,
-					dirname(__FILE__).'/views/templates/'
+					dirname(__FILE__) . '/views/templates/'
 				);
 			}
 			// Add the module to recorded alerts

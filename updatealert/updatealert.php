@@ -1,38 +1,25 @@
 <?php
 /**
- * 2007-2015 PrestaShop
- *
  * NOTICE OF LICENSE
  *
- * This source file is subject to the Academic Free License (AFL 3.0)
- * that is bundled with this package in the file LICENSE.txt.
- * It is also available through the world-wide-web at this URL:
- * http://opensource.org/licenses/afl-3.0.php
- * If you did not receive a copy of the license and are unable to
- * obtain it through the world-wide-web, please send an email
- * to license@prestashop.com so we can send you a copy immediately.
+ * This file is licenced under the Software License Agreement.
+ * With the purchase or the installation of the software in your application
+ * you accept the licence agreement.
  *
- * DISCLAIMER
+ * You must not modify, adapt or create derivative works of this source code
  *
- * Do not edit or add to this file if you wish to upgrade PrestaShop to newer
- * versions in the future. If you wish to customize PrestaShop for your
- * needs please refer to http://www.prestashop.com for more information.
- *
- * @author    PrestaShop SA <contact@prestashop.com>
- * @copyright 2007-2015 PrestaShop SA
- * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
- *  International Registered Trademark & Property of PrestaShop SA
+ * @author    eworld Accelerator
+ * @copyright 2010-2016 E-WORLD-CONCEPT SAS
+ * @license   LICENSE.txt
  */
 
 if (!defined('_PS_VERSION_')) {
 	exit;
 }
 
-require_once 'UpdateAlertModule.php';
-require_once 'UpdateAlertCron.php';
-require_once 'UpdateAlertAlert.php';
-
 class UpdateAlert extends Module {
+
+	protected $config_form = false;
 
 	public function __construct() {
 		$this->name = 'updatealert';
@@ -52,7 +39,6 @@ class UpdateAlert extends Module {
 
 		$this->displayName = $this->l('Update Alert');
 		$this->description = $this->l('Send you emails for each update (Prestashop or modules)');
-		$this->confirmUninstall = $this->l('Warning: all the data saved in your database will be deleted. Are you sure you want uninstall this module?');
 
 		$this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 
@@ -60,22 +46,6 @@ class UpdateAlert extends Module {
 		if (version_compare(_PS_VERSION_, '1.5', '<')) {
 			require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
 		}
-	}
-
-	/**
-	 * Don't forget to create update methods if needed:
-	 * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
-	 */
-	public function install() {
-		// Install Tab
-		/*$tab = new Tab();
-		$tab->name[$this->context->language->id] = 'Update Alert';
-		$tab->class_name = 'AdminUpdateAlert';
-		$tab->id_parent = 0; // Home tab
-		$tab->module = $this->name;
-		$tab->add();*/
-
-		return parent::install();
 	}
 
 	public function uninstall() {
@@ -102,7 +72,7 @@ class UpdateAlert extends Module {
 		/**
 		 * If values have been submitted in the form, process.
 		 */
-		if (((bool)Tools::isSubmit('submitUpdateAlertModule')) == true) {
+		if (((bool)Tools::isSubmit('submitUpdatealertModule')) == true) {
 			$this->postProcess();
 		}
 
@@ -110,7 +80,7 @@ class UpdateAlert extends Module {
 
 		$output = $this->context->smarty->fetch($this->local_path . 'views/templates/admin/configure.tpl');
 
-		if (isset($this->errors) && is_array($this->errors) && sizeof($this->errors) > 0) {
+		if (isset($this->errors) && is_array($this->errors) && count($this->errors) > 0) {
 			$output .= join("\r\n", $this->errors);
 		}
 
@@ -156,20 +126,20 @@ class UpdateAlert extends Module {
 				),
 				'input' => array(
 					array(
-						'type'      => 'radio',
-						'label'     => $this->l('Enable system'),
-						'name'      => 'EWORLDACCELERATOR_UPDATEALERT_ENABLED',
-						'class'     => 't',
-						'required'  => true,
-						'is_bool'   => true,
-						'values'    => array(
+						'type' => 'radio',
+						'label' => $this->l('Enable system'),
+						'name' => 'EWORLDACCELERATOR_UPDATEALERT_ENABLED',
+						'class' => 't',
+						'required' => true,
+						'is_bool' => true,
+						'values' => array(
 							array(
-								'id'    => 'active_on',                           // The content of the 'id' attribute of the <input> tag, and of the 'for' attribute for the <label> tag.
+								'id' => 'active_on',                           // The content of the 'id' attribute of the <input> tag, and of the 'for' attribute for the <label> tag.
 								'value' => 1,                                     // The content of the 'value' attribute of the <input> tag.
 								'label' => $this->l('Enabled')                    // The <label> for this radio button.
 							),
 							array(
-								'id'    => 'active_off',
+								'id' => 'active_off',
 								'value' => 2,
 								'label' => $this->l('Disabled')
 							)
@@ -183,12 +153,12 @@ class UpdateAlert extends Module {
 						'required' => true
 					),
 					array(
-						'type'     => 'text',
-						'label'    => $this->l('Day(s) between alerts'),
-						'name'     => 'EWORLDACCELERATOR_UPDATEALERT_DAYS',
-						'class'    => 'lg',
+						'type' => 'text',
+						'label' => $this->l('Day(s) between alerts'),
+						'name' => 'EWORLDACCELERATOR_UPDATEALERT_DAYS',
+						'class' => 'lg',
 						'required' => true,
-						'desc'     => $this->l('Minimum: 1, Maximum: 31')
+						'desc' => $this->l('Minimum: 1, Maximum: 31')
 					),
 				),
 				'submit' => array(
@@ -204,14 +174,14 @@ class UpdateAlert extends Module {
 	 */
 	protected function getConfigFormValues() {
 		// Definied values
-		if (intval(trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 1 || intval(trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'))) == 2) {
+		$enabled = (int)trim(Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'));
+		if ($enabled == 1 || $enabled == 2) {
 			return array(
-				'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED'),
+				'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => $enabled,
 				'EWORLDACCELERATOR_UPDATEALERT_EMAIL' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_EMAIL'),
 				'EWORLDACCELERATOR_UPDATEALERT_DAYS' => Configuration::get('EWORLDACCELERATOR_UPDATEALERT_DAYS'),
 			);
-		}
-		// Default values
+		} // Default values
 		else {
 			return array(
 				'EWORLDACCELERATOR_UPDATEALERT_ENABLED' => 1,
@@ -227,32 +197,29 @@ class UpdateAlert extends Module {
 	protected function postProcess() {
 		$enabled = trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED'));
 		$emailList = trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_EMAIL'));
-		$days = intval(trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_DAYS')));
+		$days = (int)trim(Tools::getValue('EWORLDACCELERATOR_UPDATEALERT_DAYS'));
 
 		if ($enabled != 1 && $enabled != 2) {
 			$this->errors[] = $this->displayError($this->l('Enabled value is not recognized'));
-		}
-		else {
+		} else {
 			$oldValue = Configuration::get('EWORLDACCELERATOR_UPDATEALERT_ENABLED');
 			Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_ENABLED', $enabled);
 			if ($enabled == 1 && $oldValue == 2) {
 				$this->errors[] = $this->displayConfirmation($this->l('System enabled'));
-			}
-			else if ($enabled == 2 && $oldValue == 1) {
+			} else if ($enabled == 2 && $oldValue == 1) {
 				$this->errors[] = $this->displayConfirmation($this->l('System disabled'));
 			}
 		}
 		if ($emailList == '') {
 			$this->errors[] = $this->displayError($this->l('Email list is empty. You must set at least 1 email'));
-		}
-		else {
+		} else {
 			$listOk = true;
 			$emailArray = explode(PHP_EOL, $emailList);
-			if (sizeof($emailArray) > 0) {
+			if (count($emailArray) > 0) {
 				foreach ($emailArray as $currentEmail) {
 					$currentEmail = trim($currentEmail);
 					if (filter_var($currentEmail, FILTER_VALIDATE_EMAIL) === false) {
-						$this->errors[] = $this->displayError($this->l($currentEmail.' is not a valid email address'));
+						$this->errors[] = $this->displayError($this->l($currentEmail . ' is not a valid email address'));
 						$listOk = false;
 					}
 				}
@@ -263,9 +230,12 @@ class UpdateAlert extends Module {
 		}
 		if ($days < 1 || $days > 31) {
 			$this->errors[] = $this->displayError($this->l('Days value is not correct'));
-		}
-		else {
+		} else {
 			Configuration::updateValue('EWORLDACCELERATOR_UPDATEALERT_DAYS', $days);
 		}
 	}
 }
+
+require_once 'UpdateAlertModule.php';
+require_once 'UpdateAlertCron.php';
+require_once 'UpdateAlertAlert.php';
