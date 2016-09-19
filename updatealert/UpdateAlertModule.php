@@ -1,5 +1,4 @@
 <?php
-
 /**
  * NOTICE OF LICENSE
  *
@@ -13,44 +12,50 @@
  * @copyright 2010-2016 E-WORLD-CONCEPT SAS
  * @license   LICENSE.txt
  */
-class UpdateAlertModule {
-	private $name;
-	private $moduleName;
-	private $currentVersion;
-	private $availableVersion;
+class UpdateAlertModule
+{
+    private $name;
+    private $moduleName;
+    private $currentVersion;
+    private $availableVersion;
 
-	public function __construct($name, $moduleName, $currentVersion, $availableVersion) {
-		$this->name = $name;
-		$this->moduleName = $moduleName;
-		$this->currentVersion = $currentVersion;
-		$this->availableVersion = $availableVersion;
-	}
+    public function __construct($name, $moduleName, $currentVersion, $availableVersion)
+    {
+        $this->name = $name;
+        $this->moduleName = $moduleName;
+        $this->currentVersion = $currentVersion;
+        $this->availableVersion = $availableVersion;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getName() {
-		return $this->name;
-	}
+    /**
+     * @return mixed
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getModuleName() {
-		return $this->moduleName;
-	}
+    /**
+     * @return mixed
+     */
+    public function getModuleName()
+    {
+        return $this->moduleName;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getCurrentVersion() {
-		return $this->currentVersion;
-	}
+    /**
+     * @return mixed
+     */
+    public function getCurrentVersion()
+    {
+        return $this->currentVersion;
+    }
 
-	/**
-	 * @return mixed
-	 */
-	public function getAvailableVersion() {
-		return $this->availableVersion;
-	}
+    /**
+     * @return mixed
+     */
+    public function getAvailableVersion()
+    {
+        return $this->availableVersion;
+    }
 }
