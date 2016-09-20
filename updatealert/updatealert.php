@@ -26,7 +26,7 @@ class UpdateAlert extends Module
     {
         $this->name = 'updatealert';
         $this->tab = 'administration';
-        $this->version = '0.1.0';
+        $this->version = '0.2.0';
         $this->author = 'eworld Accelerator';
         $this->need_instance = 0;
 

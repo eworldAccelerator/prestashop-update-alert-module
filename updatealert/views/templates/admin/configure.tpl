@@ -38,9 +38,9 @@
 	<button data-dismiss="alert" class="close" type="button">×</button>
 	<h4>UpdateAlert needs a cron job executed every day</h4>
 	<ul class="list-unstyled">
-		<li><strong>You know how to configure a cron job</strong> => add this <em>0 5 * * * wget {$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}/modules/updatealert/cron.php -O /dev/null</em></li>
+		<li><strong>You know how to configure a cron job</strong> => add this <em>0 5 * * * wget {$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}{$smarty.const.__PS_BASE_URI__|escape:'htmlall':'UTF-8'}modules/updatealert/cron.php -O /dev/null</em></li>
 		<li>or</li>
-		<li><strong>You don't know how to add a cron job</strong> => so register on <a href="https://cron-job.org/" target="_blank">cron-job.org (100% free service)</a> and create a cron job like <a href="{$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}/modules/updatealert/views/img/cronjob.org.png" target="_blank">described here</a> with this URL : {$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}/modules/updatealert/cron.php</li>
+		<li><strong>You don't know how to add a cron job</strong> => so register on <a href="https://cron-job.org/" target="_blank">cron-job.org (100% free service)</a> and create a cron job like <a href="{$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}{$smarty.const.__PS_BASE_URI__|escape:'htmlall':'UTF-8'}modules/updatealert/views/img/cronjob.org.png" target="_blank">described here</a> with this URL : {$smarty.const._PS_BASE_URL_|escape:'htmlall':'UTF-8'}{$smarty.const.__PS_BASE_URI__|escape:'htmlall':'UTF-8'}modules/updatealert/cron.php</li>
 	</ul>
 	<br />
 	Without this cron job, UpdateAlert module can't send email automatically.

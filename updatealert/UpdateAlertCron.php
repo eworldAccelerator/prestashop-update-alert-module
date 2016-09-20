@@ -52,8 +52,8 @@ class UpdateAlertCron
         }
 
         // Check Prestashop Core
-        $upgradeCore = new UpgraderCore(true);
-        $this->prestashopUpgrade = $upgradeCore->checkPSVersion();
+        $upgradeCore = new Upgrader(true);
+        $this->prestashopUpgrade = $upgradeCore->checkPSVersion(true);
 
         if ($this->debugMode && $this->isPrestashopNeedsUpgrade()) {
             echo 'Prestashop needs an upgrade to ' . $this->prestashopUpgrade['name'] . '<br />';
