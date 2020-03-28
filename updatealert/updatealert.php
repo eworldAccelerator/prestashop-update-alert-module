@@ -42,13 +42,25 @@ class UpdateAlert extends Module
         $this->displayName = $this->l('Update Alert');
         $this->description = $this->l('Send you emails for each update (Prestashop or modules)');
 
-        /* Have to force max to 1.7 cause compliancy is wrong in Prestashop module class */
-        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => '1.7');
+        /* Have to force max to 1.7 cause compliancy is wrong in Prestashop module class
+        Why ?? I've cancelled this ! */
+        $this->ps_versions_compliancy = array('min' => '1.5', 'max' => _PS_VERSION_);
 
         /* Backward compatibility */
         if (version_compare(_PS_VERSION_, '1.5', '<')) {
             require(_PS_MODULE_DIR_ . $this->name . '/backward_compatibility/backward.php');
         }
+    }
+
+    /**
+     * Don't forget to create update methods if needed:
+     * http://doc.prestashop.com/display/PS16/Enabling+the+Auto-Update
+     */
+    public function install()
+    {
+        Configuration::updateValue('EACC_UPDATEALERT_ENABLED', false);
+
+        return parent::install();
     }
 
     public function uninstall()
